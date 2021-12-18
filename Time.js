@@ -27,13 +27,16 @@ async function getLastestTime() {
   });
   const latesttime = db.collection('time').doc(id);
   const doc = await latesttime.get();
-  
-  if(loop.size == 0)
+  var arr = [];
+  if(loop.size == 0){
     console.log("Time queue is empty.");
-    //return ("Time queue is empty.");
-  else
+    return ({time: "Time queue is empty." })
+  }
+    
+  else{
     console.log(toDateString(doc.data().time));
-    //return toDateString(doc.data().time);
+    return (toDateString(doc.data().time));
+  }
 }
 
 async function getAllTimes() {
@@ -42,7 +45,7 @@ async function getAllTimes() {
   const loop = await timeRef.get();
   var array = [];
    loop.forEach((doc) => {
-      array.push(toDateString(doc.data().time));
+      array.push(toDateString(doc.data().time)+"  ");
    });
    console.log(array);
    return array;

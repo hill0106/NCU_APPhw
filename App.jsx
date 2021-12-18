@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  StyleSheet, Text, Button, View,
+  StyleSheet, Text, Button, View, RefreshControl
 } from 'react-native';
 import firebase from 'firebase';
 import TimeController from './Time';
@@ -12,6 +12,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  alltime:{
+    marginRight: 10,
   },
 });
 
@@ -32,12 +35,45 @@ export default function App() {
   } else {
     firebase.app();
   }
+
+  const [item, setItem] = useState([]);
+  const [alltime, setAlltime] = useState([]);
+  const [check, setChek] = useState(false);
+  const [check1, setChek1] = useState(false);
+    useEffect(() => {
+        TimeController.getLastestTime().then(res => setItem(res));
+        TimeController.getAllTimes().then(res => setAlltime(res));
+    },[]);
+
+  const clickHandler = () => {
+    setChek(!check);
+  }
+  const clickHandler1 = () => {
+    setChek1(!check1);
+  }
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = () => {
+    setRefreshing(true);
+    TimeController.getAllTimes().then((res) => {
+      setRefreshing(false);
+    });
+  }
  
   return (
     <View style={styles.container}>
-      <Button onPress={TimeController.getLastestTime} title="get lastest time" color="#FFBF00" />
+      <Button onPress={() =>{TimeController.getLastestTime().then(clickHandler) }} title="get lastest time" color="#FFBF00" />
+      {check && <Text>{item}{'\n'}</Text> }
       <Text>{'\n'}</Text>
-      <Button onPress={TimeController.getAllTimes} title="get all time" color="#007FFF" />
+      
+      <Button onPress={() => {TimeController.getAllTimes().then(clickHandler1)}} title="get all time" color="#007FFF" />
+      {check1 && <Text 
+        style={styles.alltime} 
+        refreshControl={(
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        )}>{alltime}</Text>}
       <Text>{'\n'}</Text>
       <Button onPress={TimeController.addCurrentTime} title="add current time" color="#00FF00" />
       <Text>{'\n'}</Text>
